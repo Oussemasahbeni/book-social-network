@@ -39,3 +39,17 @@ r
 Bbook-network/src/main/java/com/oussema/bsn/email/EmailService.java,8\e\8ee98e0f8aefe9be605315811a2fd0ea86b8a2a2
 w
 Gbook-network/src/main/java/com/oussema/bsn/email/EmailTemplateName.java,4\1\418cc88b26771c5b78d32add385801aa3ba735ad
+G
+book-network/.gitignore,e\b\eb9a07efed67e0e1e32f86a340efd850f93541af
+{
+Kbook-network/src/main/java/com/oussema/bsn/auth/AuthenticationResponse.java,d\4\d4f135a1f70f80ff0e69214e9bc8c572e04e29d0
+z
+Jbook-network/src/main/java/com/oussema/bsn/auth/AuthenticationRequest.java,d\6\d67bfc039e9c7a4183e97cdc017f7233001fe775
+~
+Nbook-network/src/main/java/com/oussema/bsn/handler/GlobalExceptionHandler.java,2\2\22ccf7785008ad7a712eb64969997ee608ad5cdf
+y
+Ibook-network/src/main/java/com/oussema/bsn/handler/ExceptionResponse.java,7\3\73d84dbbf0af0d1da0384852eb0183cac1d63dd4
+y
+Ibook-network/src/main/java/com/oussema/bsn/handler/BusinessErrorCode.java,6\2\6270c844829cd1a4c4c27f13bb60d2fd0023f0a0
+z
+Jbook-network/src/main/java/com/oussema/bsn/handler/BusinessErrorCodes.java,3\3\338ec55896786fc6dd1716afe9c77a9615b18198

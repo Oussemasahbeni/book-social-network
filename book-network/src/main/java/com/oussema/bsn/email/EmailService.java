@@ -22,7 +22,7 @@ public class EmailService {
     private final SpringTemplateEngine templateEngine;
 
     @Async
-    public void SendEmail(String to,
+    public void sendEmail(String to,
                           String username,
                           EmailTemplateName emailTemplate,
                           String confirmationUrl,
@@ -44,7 +44,7 @@ public class EmailService {
         Map<String,Object> properties = new HashMap<>();
         properties.put("username", username);
         properties.put("confirmationUrl", confirmationUrl);
-        properties.put("activationCode", activationCode);
+        properties.put("activation_code", activationCode);
 
         Context context = new Context();
         context.setVariables(properties);

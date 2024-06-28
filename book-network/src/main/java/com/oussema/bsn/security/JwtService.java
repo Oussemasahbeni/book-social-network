@@ -51,7 +51,7 @@ public class JwtService {
     }
 
     // Generate the token with the claims and the user details
-    private String generateToken(Map<String, Object> claims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
         return buildToken(claims, userDetails,jwtExpiration);
     }
 
