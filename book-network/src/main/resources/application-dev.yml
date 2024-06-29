@@ -7,29 +7,29 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    #    show-sql: true
     properties:
       hibernate:
-        format_sql: true
+        #        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   mail:
-      host: localhost
-      port: 1025
-      username: oussema
-      password: oussema
-      properties:
-        mail:
+    host: localhost
+    port: 1025
+    username: oussema
+    password: oussema
+    properties:
+      mail:
+        smtp:
           smtp:
-           smtp:
-             trust: "*"
-           auth: true
-           starttls:
-             enable: true
-             connectiontimout: 5000
-             timeout: 3000
-             writetimeout: 5000
+            trust: "*"
+          auth: true
+          starttls:
+            enable: true
+            connectiontimout: 5000
+            timeout: 3000
+            writetimeout: 5000
 
 application:
   security:
@@ -42,6 +42,9 @@ application:
   mailing:
     frontend:
       activation-url: http://localhost:4200/activate-account
+  file:
+    uploads:
+      photos-output-path: ./uploads
 
 server:
   port: 8088

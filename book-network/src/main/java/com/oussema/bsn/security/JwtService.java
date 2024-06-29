@@ -22,7 +22,7 @@ public class JwtService {
     @Value("${application.security.jwt.expiration}")
     private long jwtExpiration;
     @Value("${application.security.jwt.secret-key}")
-    private String secretKey;
+    private String secretKey ;
 
 
     // Extract the username from the token
