@@ -1,1 +1,50 @@
-<p>menu works!</p>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="javascript:void(0)">BSN</a>
+    <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
+            class="navbar-toggler"
+            data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a [routerLinkActiveOptions]="{exact: true}" aria-current="page" class="nav-link" routerLink="/books"
+             routerLinkActive="active">
+            <i class="fas fa-home-alt"></i>&nbsp;Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a [routerLinkActiveOptions]="{exact: true}" class="nav-link" routerLink="my-books" routerLinkActive="active">
+            <i class="fas fa-book"></i>&nbsp;My books
+          </a>
+        </li>
+        <li class="nav-item">
+          <a [routerLinkActiveOptions]="{exact: true}" class="nav-link" routerLink="my-waiting-list"
+             routerLinkActive="active">
+            <i class="fas fa-heart"></i>&nbsp;My waiting list
+          </a>
+        </li>
+        <li class="nav-item">
+          <a [routerLinkActiveOptions]="{exact: true}" class="nav-link" routerLink="my-returned-books"
+             routerLinkActive="active">
+            <i class="fa-solid fa-truck-fast"></i>&nbsp;My returned books
+          </a>
+        </li>
+        <li class="nav-item">
+          <a [routerLinkActiveOptions]="{exact: true}" class="nav-link" routerLink="my-borrowed-books"
+             routerLinkActive="active">
+            <i class="fas fa-list-check"></i>&nbsp;Borrowed books
+          </a>
+        </li>
+      </ul>
+      <form class="d-flex gap-2 align-items-center" role="search">
+        <input aria-label="Search" class="form-control" placeholder="Find a book" type="search">
+        <button class="btn btn-outline-success" type="submit"><i class="fas fa-search"></i></button>
+        <span>Welcome</span>
+        <span class="text-capitalize fw-bold">alibou</span>
+        <button (click)="logout()" class="btn btn-link" type="submit"><i class="fas fa-door-open"></i></button>
+      </form>
+    </div>
+  </div>
+</nav>
