@@ -6,5 +6,6 @@ import {provideHttpClient, withInterceptors} from "@angular/common/http";
 import {httpTokenInterceptor} from "./services/interceptor/http-token.interceptor";
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes, withViewTransitions()), provideHttpClient(withInterceptors([httpTokenInterceptor]))]
+  providers: [provideRouter(routes, withViewTransitions()), provideHttpClient(withInterceptors([httpTokenInterceptor]))],
+
 };
