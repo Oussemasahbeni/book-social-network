@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 0 # to only check the current branch
 
       - name: Setup JDK
-        users: actions/setup-jdk@v4
+        uses: actions/setup-jdk@v4
         with:
           java-version: 21
           distribution: 'corretto'
@@ -42,7 +42,7 @@ jobs:
             fetch-depth: 0 # to only check the current branch
 
         - name: Setup JDK
-          users: actions/setup-jdk@v4
+          uses: actions/setup-jdk@v4
           with:
             java-version: 21
             distribution: 'corretto'
@@ -62,7 +62,7 @@ jobs:
             fetch-depth: 0 # to only check the current branch
 
         - name: Setup JDK
-          users: actions/setup-jdk@v4
+          uses: actions/setup-jdk@v4
           with:
             java-version: 21
             distribution: 'corretto'
@@ -82,7 +82,7 @@ jobs:
             fetch-depth: 0 # to only check the current branch
 
         - name: Setup JDK
-          users: actions/setup-jdk@v4
+          uses: actions/setup-jdk@v4
           with:
             java-version: 21
             distribution: 'corretto'
