@@ -10,137 +10,137 @@ on:
       - 'docker-compose.yml'
       - .github/workflows/*-backend.yml
 
-    jobs:
-      compile:
-        runs-on: ubuntu
-        name: Compile project
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0 # to only check the current branch
+jobs:
+  compile:
+    runs-on: ubuntu
+    name: Compile project
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # to only check the current branch
 
-          - name: Setup JDK
-            users: actions/setup-jdk@v4
-            with:
-              java-version: 21
-              distribution: 'corretto'
+      - name: Setup JDK
+        users: actions/setup-jdk@v4
+        with:
+          java-version: 21
+          distribution: 'corretto'
 
-          - name: Compile project
-            run: |
-              cd book-network
-              ./mvnw clean compile
+      - name: Compile project
+        run: |
+          cd book-network
+          ./mvnw clean compile
+    
 
+    unit-tests:
+      runs-on: ubuntu
+      name: Unit tests
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0 # to only check the current branch
 
-      unit-tests:
-        runs-on: ubuntu
-        name: Unit tests
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0 # to only check the current branch
+        - name: Setup JDK
+          users: actions/setup-jdk@v4
+          with:
+            java-version: 21
+            distribution: 'corretto'
+        - name: Running unit tests
+          run: |
+            cd book-network
+            ./mvnw clean test
 
-          - name: Setup JDK
-            users: actions/setup-jdk@v4
-            with:
-              java-version: 21
-              distribution: 'corretto'
-          - name: Running unit tests
-            run: |
-              cd book-network
-              ./mvnw clean test
+    build:
+      runs-on: ubuntu
+      name: Build backend
+      needs: [ compile, unit-tests ]
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0 # to only check the current branch
 
-      build:
-        runs-on: ubuntu
-        name: Build backend
-        needs: [ compile, unit-tests ]
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0 # to only check the current branch
+        - name: Setup JDK
+          users: actions/setup-jdk@v4
+          with:
+            java-version: 21
+            distribution: 'corretto'
+        - name: Build project
+          run: |
+            cd book-network
+            ./mvnw clean package
 
-          - name: Setup JDK
-            users: actions/setup-jdk@v4
-            with:
-              java-version: 21
-              distribution: 'corretto'
-          - name: Build project
-            run: |
-              cd book-network
-              ./mvnw clean package
+    build-image:
+      name: Build Docker image
+      runs-on: ubuntu
+      needs: [ build ]
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0 # to only check the current branch
 
-      build-image:
-        name: Build Docker image
-        runs-on: ubuntu
-        needs: [ build ]
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 0 # to only check the current branch
+        - name: Setup JDK
+          users: actions/setup-jdk@v4
+          with:
+            java-version: 21
+            distribution: 'corretto'
+        - name: Extract project version
+          id: extract-version # we need this id later
+          run: |
+            cd book-network
+            echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
 
-          - name: Setup JDK
-            users: actions/setup-jdk@v4
-            with:
-              java-version: 21
-              distribution: 'corretto'
-          - name: Extract project version
-            id: extract-version # we need this id later
-            run: |
-              cd book-network
-              echo "VERSION=$(./mvnw -q -Dexec.executable='echo' -Dexec.args='${project.version}' --non-recursive exec:exec)" >> $GITHUB_OUTPUT
+        - name: Login to Dockerhub
+          uses: docker/login-action@v3
+          with:
+            username: ${{secrets.DOCKERHUB_USERNAME}}
+            password: ${{secrets.DOCKERHUB_TOKEN}}
 
-          - name: Login to Dockerhub
-            uses: docker/login-action@v3
-            with:
-              username: ${{secrets.DOCKERHUB_USERNAME}}
-              password: ${{secrets.DOCKERHUB_TOKEN}}
+        - name: Build and push to dockerhub
+          users: docker/build-push-action@v5
+          with:
+            context: book-network
+            file: docker/backend/Dockerfile
+            push: true
+            platforms: linux/amd64
+            tags: ${{secrets.DOCKERHUB_USERNAME}}/bsn-api:${{steps.extract-version.outputs.VERSION}},${{secrets.DOCKERHUB_USERNAME}}/bsn-api:latest
+            build-args: |
+              PROFILE=dev
+              APP_VERSION= ${{steps.extract-version.outputs.VERSION}}
 
-          - name: Build and push to dockerhub
-            users: docker/build-push-action@v5
-            with:
-              context: book-network
-              file: docker/backend/Dockerfile
-              push: true
-              platforms: linux/amd64
-              tags: ${{secrets.DOCKERHUB_USERNAME}}/bsn-api:${{steps.extract-version.outputs.VERSION}},${{secrets.DOCKERHUB_USERNAME}}/bsn-api:latest
-              build-args: |
-                PROFILE=dev
-                APP_VERSION= ${{steps.extract-version.outputs.VERSION}}
+    deploy:
+      name: Deploy Backend
+      runs-on: ubuntu
+      needs: [ build-image ]
+      steps:
+        - name: Create Deployment folder
+          run: ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_VPS_IP}} "mkdir -p ci-cd"
 
-      deploy:
-        name: Deploy Backend
-        runs-on: ubuntu
-        needs: [ build-image ]
-        steps:
-          - name: Create Deployment folder
-            run: ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_VPS_IP}} "mkdir -p ci-cd"
+        - name: Install Docker
+          run: |
+            ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}} <<EOF
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce
+            EOF
 
-          - name: Install Docker
-            run: |
-              ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}} <<EOF
-              sudo apt-get update
-              sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-              sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-              sudo apt-get update
-              sudo apt-get install -y docker-ce
-              EOF
-
-          - name: Copy docker-compose file
-            run:
-              scp docker-compose.yml ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}}:ci-cd/docker-compose.yml
-          - name: Set environment variables and deploy
-            run: |
-              ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}} <<EOF     
-              export EMAIL_USER_NAME=${{ secrets.EMAIL_USER_NAME }}
-              export EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
-              cd ci-cd
-              docker compose -f docker-compose.yml pull -q
-              docker compose -f docker-compose.yml up -d
-              EOF
+        - name: Copy docker-compose file
+          run:
+            scp docker-compose.yml ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}}:ci-cd/docker-compose.yml
+        - name: Set environment variables and deploy
+          run: |
+            ssh ${{secrets.VPS_USERNAME}}@${{secrets.VPS_IP}} <<EOF     
+            export EMAIL_USER_NAME=${{ secrets.EMAIL_USER_NAME }}
+            export EMAIL_PASSWORD=${{ secrets.EMAIL_PASSWORD }}
+            cd ci-cd
+            docker compose -f docker-compose.yml pull -q
+            docker compose -f docker-compose.yml up -d
+            EOF
 
 #  health-check:
 #    name: API Health Check
